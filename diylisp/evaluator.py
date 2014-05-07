@@ -16,8 +16,8 @@ making your work a bit easier. (We're supposed to get through this thing
 in a day, after all.)
 """
 
+
 BASIC_FUNCS = {
-    'quote': id, # quoted expressions are not evaluated, but returned as is
     '+': operator.add,
     '-': operator.sub,
     '/': operator.div,
@@ -27,12 +27,16 @@ BASIC_FUNCS = {
 }
 
 
+
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
     if is_atom(ast):
         return env.lookup(ast)
     elif is_list(ast):
         first = ast[0]
+
+        if first == 'quote': # quoted expressions are not evaluated
+            return ast[1]
 
         if first == 'atom':
             return is_atom(evaluate(ast[1], env))
@@ -46,6 +50,12 @@ def evaluate(ast, env):
 
         if first in BASIC_FUNCS:
             try:
-                return reduce(BASIC_FUNCS[first], ast[1:])
+                return reduce(BASIC_FUNCS[first], [evaluate(e, env) for e in ast[1:]])
             except TypeError, e:
                 raise LispError(e)
+
+        if first == 'if':
+            if evaluate(ast[1], env) == True:
+                return evaluate(ast[2], env)
+            else:
+                return evaluate(ast[3], env)
