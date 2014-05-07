@@ -82,4 +82,3 @@ def test_math_oprators_only_work_on_numbers():
 
     with assert_raises(LispError):
         evaluate(parse("(+ 1 'foo)"), Environment())
-

@@ -9,7 +9,7 @@ The LispError class you can have for free :)
 
 class LispError(Exception): 
     """General lisp error class."""
-    pass
+
 
 class Closure:
     
@@ -19,13 +19,14 @@ class Closure:
     def __str__(self):
         return "<closure/%d>" % len(self.params)
 
+
 class Environment:
 
     def __init__(self, variables=None):
         self.variables = variables if variables else {}
 
     def lookup(self, symbol):
-        raise NotImplementedError("DIY")
+        return self.variables.get(symbol, symbol)
 
     def extend(self, variables):
         raise NotImplementedError("DIY")
