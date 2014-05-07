@@ -76,3 +76,11 @@ def evaluate(ast, env):
             defined = evaluate(ast[2], env)
             env.set(ast[1], defined)
             return defined
+
+        if first == 'lambda':
+            if not is_list(ast[1]):
+                raise LispError('lambda arguments not in a list')
+            if len(ast) != 3:
+                raise LispError('Wrong number of arguments for lambda')
+            return Closure(env, ast[1], ast[2])
+
