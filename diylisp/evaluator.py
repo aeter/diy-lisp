@@ -73,9 +73,6 @@ def evaluate(ast, env):
                 raise LispError('Wrong number of arguments for "define"')
             if not is_symbol(ast[1]): # (define #t 1000)
                 raise LispError('Attempt to define a non-symbol')
-            if is_list(ast[2]):
-                defined = evaluate(ast[2], env)
-            else:
-                defined = ast[2]
+            defined = evaluate(ast[2], env)
             env.set(ast[1], defined)
             return defined
