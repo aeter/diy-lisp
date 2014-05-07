@@ -10,11 +10,37 @@ the workshop. It's job is to convert strings into data structures that the evalu
 understand. 
 """
 
+def parse_single_exp(exp):
+    exp = exp.strip()
+    if exp.startswith('('):
+        return parse_list(exp)
+    elif exp.startswith("'"):
+        return ['quote', parse_single_exp(exp[1:])]
+    elif exp == '#t':
+        return True
+    elif exp == '#f':
+        return False
+    elif exp.isdigit():
+        return int(exp)
+    else:
+        return str(exp)
+
+def parse_list(exp):
+    # remove leading and trailing brackets -> '(', ')'
+    exp = exp[1:]
+    exp = exp[:-1]
+    try:
+        return [parse_single_exp(e) for e in split_exps(exp)]
+    except AttributeError, e:
+        if str(e) == "'NoneType' object has no attribute 'end'":
+            raise LispError('Expected EOF')
+
+
 def parse(source):
     """Parse string representation of one *single* expression
     into the corresponding Abstract Syntax Tree."""
+    return parse_single_exp(remove_comments(source))
 
-    raise NotImplementedError("DIY")
 
 ##
 ## Below are a few useful utility functions. These should come in handy when 

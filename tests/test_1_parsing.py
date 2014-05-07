@@ -142,7 +142,7 @@ def test_nested_quotes():
     assert_equals(["quote", ["quote", ["quote", ["quote", "foo"]]]], parse("''''foo"))
 
 def test_expand_crazy_quote_combo():
-    """One final test to see that quote expansion works."""
+    #""One final test to see that quote expansion works.""
 
     source = "'(this ''''(makes ''no) 'sense)"
     assert_equals(source, unparse(parse(source)))
