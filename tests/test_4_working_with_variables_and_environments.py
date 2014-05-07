@@ -70,7 +70,6 @@ def test_redefine_variables_illegal():
     with assert_raises_regexp(LispError, "already defined"):
         env.set("foo", 2)
 
-
 """
 With the `Environment` working, it's time to implement evaluation of expressions 
 with variables.

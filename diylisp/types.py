@@ -7,6 +7,10 @@ It's your job to implement the Closure and Environment types.
 The LispError class you can have for free :)
 """
 
+
+from copy import deepcopy
+
+
 class LispError(Exception): 
     """General lisp error class."""
 
@@ -26,10 +30,17 @@ class Environment:
         self.variables = variables if variables else {}
 
     def lookup(self, symbol):
-        return self.variables.get(symbol, symbol)
+        try:
+            return self.variables[symbol]
+        except KeyError:
+            raise LispError("%s is not defined" % symbol)
 
     def extend(self, variables):
-        raise NotImplementedError("DIY")
+        new_vars = deepcopy(self.variables)
+        new_vars.update(variables)
+        return Environment(new_vars)
 
     def set(self, symbol, value):
-        raise NotImplementedError("DIY")
+        if symbol in self.variables:
+            raise LispError('%s is already defined' % symbol)
+        self.variables[symbol] = value
