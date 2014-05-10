@@ -84,3 +84,17 @@ def evaluate(ast, env):
                 raise LispError('Wrong number of arguments for lambda')
             return Closure(env, ast[1], ast[2])
 
+        if is_closure(first):
+            # evaluate all params passed to the closure
+            params_values = []
+            for v in ast[1:]:
+                if is_list(v):
+                    params_values.append(evaluate(v, env))
+                else:
+                    params_values.append(v)
+            local_fn_params = dict(zip(first.params, params_values))
+            # use variables from the environment when the closure was defined
+            local_fn_params.update(first.env.variables)
+            new_env = env.extend(local_fn_params)
+            return evaluate(first.body, new_env)
+
