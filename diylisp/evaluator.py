@@ -30,6 +30,8 @@ BASIC_FUNCS = {
 
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
+
+
     if is_integer(ast) or is_boolean(ast):
         return ast
     if is_atom(ast):
@@ -98,6 +100,10 @@ def evaluate(ast, env):
         if first == 'empty':
             the_list = evaluate(ast[1], env)
             return len(the_list) == 0
+
+        if first == 'print':
+            print evaluate(ast[1], env)
+            return 'nil'
 
         if first == 'lambda':
             if not is_list(ast[1]):
