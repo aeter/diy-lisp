@@ -37,6 +37,11 @@ def evaluate(ast, env):
     if is_list(ast):
         first = ast[0]
 
+        if is_list(first):
+            # evaluate lambda functions directly -> ((lambda (x) x) 42) -> 42
+            closure = evaluate(first, env)
+            return evaluate_closure(closure, ast[1:], env)
+
         if first == 'quote': # quoted expressions are not evaluated
             # 'foo  --> 'foo
             return ast[1]
@@ -85,16 +90,24 @@ def evaluate(ast, env):
             return Closure(env, ast[1], ast[2])
 
         if is_closure(first):
-            # evaluate all params passed to the closure
-            params_values = []
-            for v in ast[1:]:
-                if is_list(v):
-                    params_values.append(evaluate(v, env))
-                else:
-                    params_values.append(v)
-            local_fn_params = dict(zip(first.params, params_values))
-            # use variables from the environment when the closure was defined
-            local_fn_params.update(first.env.variables)
-            new_env = env.extend(local_fn_params)
-            return evaluate(first.body, new_env)
+            return evaluate_closure(first, ast[1:], env)
+
+        if is_symbol(first) and is_closure(env.lookup(first)):
+            # (define add (x y) (+ x y)) -> {'add': <closure 1234>}
+            return evaluate_closure(env.lookup(first), ast[1:], env)
+
+
+def evaluate_closure(closure, params, env):
+    # evaluate each param passed to the closure
+    params_values = []
+    for p in params:
+        if is_list(p):
+            params_values.append(evaluate(p, env))
+        else:
+            params_values.append(p)
+    local_fn_params = dict(zip(closure.params, params_values))
+    # use variables from the environment when the closure was defined
+    local_fn_params.update(closure.env.variables)
+    new_env = env.extend(local_fn_params)
+    return evaluate(closure.body, new_env)
 
