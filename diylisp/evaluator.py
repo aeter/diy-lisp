@@ -93,11 +93,17 @@ def evaluate(ast, env):
             return evaluate_closure(first, ast[1:], env)
 
         if is_symbol(first) and is_closure(env.lookup(first)):
-            # (define add (x y) (+ x y)) -> {'add': <closure 1234>}
+            # (define add (lambda (x y) (+ x y))) -> {'add': <closure 1234>}
             return evaluate_closure(env.lookup(first), ast[1:], env)
+
+        # A bad call -> (#t 'foo 'bar') or (42 'foo), etc.
+        raise LispError('not a function')
 
 
 def evaluate_closure(closure, params, env):
+    if len(closure.params) != len(params):
+        raise LispError('wrong number of arguments, expected %d got %d' % (
+            len(closure.params), len(params)))
     # evaluate each param passed to the closure
     params_values = []
     for p in params:
