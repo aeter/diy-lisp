@@ -82,6 +82,23 @@ def evaluate(ast, env):
             env.set(ast[1], defined)
             return defined
 
+        if first == 'cons':
+            return [evaluate(ast[1], env)] + evaluate(ast[2], env)
+
+        if first == 'head':
+            the_list = evaluate(ast[1], env)
+            if len(the_list) == 0:
+                raise LispError('cannot get first element from empty list')
+            return the_list[0] 
+
+        if first == 'tail':
+            the_list = evaluate(ast[1], env)
+            return the_list[1:]
+
+        if first == 'empty':
+            the_list = evaluate(ast[1], env)
+            return len(the_list) == 0
+
         if first == 'lambda':
             if not is_list(ast[1]):
                 raise LispError('lambda arguments not in a list')
